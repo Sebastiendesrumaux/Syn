@@ -831,7 +831,7 @@ class DetecteurDeGamme {
 				if (gammes_possibles[i]) return(i);
 		}
 		void processMuted() {
-			muted=0;
+		  muted=0;//hop
 			process();
 			muted=0;
 		}
