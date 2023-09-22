@@ -1,5 +1,8 @@
 // -*- coding: utf-8 -*-
 //emacs M-g g goto-line
+// alt-W pour copier une zone dans le presse papier sous emacs
+// ctrl-W pour l'effacer
+// et ctrl-Y pour la yanker
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -33,7 +36,7 @@ int new_txt_video_clip=0;
 int dbg=0;
 int affiche_pastilles=1;	
 int affiche_poles=0;	
-int auto_change=1;
+int auto_change=0;
 int leds=0; //parce que quand on lance gdb, on ne lance pas la partie python et donc le programme ne décolle pas
 //on pourrait tester en lançant la partie python avec un exec mais on a la flemme
 //donc si tu veux remettre les leds quand le programme est debugué, n'hésite pas à repasser ça a 1
@@ -105,7 +108,7 @@ int haptique=0;
 
 int debug=0;
 
-int midi_simulation=0; // pour jouer automatiquement 
+int midi_simulation=1; // pour jouer automatiquement 
 int midi_simulation_sleep_time=5;//20; // le temps entre chaque note random
 
 char **gargv;
@@ -805,56 +808,59 @@ class TestAnagramme {
 	}
 };
 class DetecteurDeGamme {
-	public:
-		int gammes_possibles[12];
-		int nb_gammes_possibles;
-		int gamme;
-		int muted=1;
-		char *notes_gamme_cat(int gamme, char *s) {
-			for (int i=0;i<7;i++) {
-				strcat(s,note_name(gammes[gamme][i]));
-				strcat(s," ");
-			}
-			return s;	
-		}
+public:
+  int gammes_possibles[12];
+  int nb_gammes_possibles;
+  int gamme;
+  int muted=0;
+  char *notes_gamme_cat(int gamme, char *s) {
+    for (int i=0;i<7;i++) {
+      strcat(s,note_name(gammes[gamme][i]));
+      strcat(s," ");
+    }
+    return s;	
+  }
 
-
-		DetecteurDeGamme() {
-			for (int i=0;i<12;i++) {
-				gammes_possibles[i]=1;
-			}
-		}
-		int une_gamme_possible_ou_DO() {
-			if (nb_gammes_possibles==0) return DO;
-			if (nb_gammes_possibles==1) return gamme;
-			for (int i=0;i<12;i++) 
-				if (gammes_possibles[i]) return(i);
-		}
-		void processMuted() {
-		  muted=0;//hop
-			process();
-			muted=0;
-		}
-		// est ce que la note fait passer la gamme dans une autre gamme,
-		// sinon la note est dite mauve et la méthode retourne -1
-		// cette methode n'est appelable que si
-		
-		int is_cette_note_fait_passer_la_gamme_dans_une_autre_gamme(int gamme, int note) {
-			int gamme_a_tester[7];
-			//autrement dit
-			for (int i=0;i<7;i++) {
-				// on va remplacer la ième note de la gamme en cours par la note et 
-				// regarder si on obtient une gamme
-				if (gammes[gamme][i]!=note) {
-					// on commence par créer la "gamme" à tester
-					for (int j=0;j<7;j++) {
-						gamme_a_tester[j]=gammes[gamme][j];										
-					}
-					gamme_a_tester[i]=note;
-					// et maintenant on regarde si la gamme 
-					// à tester est un anagramme d'une gamme
-					for (int k=0;k<12;k++) {
-						if (are_anagrammes(gamme_a_tester,gammes[k],7)) return k;			
+  DetecteurDeGamme() {
+    for (int i=0;i<12;i++) {
+      gammes_possibles[i]=1;
+    }
+  }
+  int une_gamme_possible_ou_DO() {
+    if (nb_gammes_possibles==0) return DO;
+    if (nb_gammes_possibles==1) return gamme;
+    for (int i=0;i<12;i++) 
+      if (gammes_possibles[i]) return(i);
+  }
+  void processMuted() {
+    muted=0;//hop
+    process();
+    muted=1;
+  }
+  // est ce que la note fait passer la gamme dans une autre gamme,
+  // sinon la note est dite mauve et la méthode retourne -1
+  // cette methode n'est appelable que si
+  
+  int is_cette_note_fait_passer_la_gamme_dans_une_autre_gamme(int gamme, int note) {
+    int gamme_a_tester[7];
+    //autrement dit
+    for (int i=0;i<7;i++) {
+      // on va remplacer la ième note de la gamme en cours par la note et 
+      // regarder si on obtient une gamme
+      if (gammes[gamme][i]!=note) {
+	// on commence par créer la "gamme" à tester
+	for (int j=0;j<7;j++) {
+	  gamme_a_tester[j]=gammes[gamme][j];										
+	}
+	gamme_a_tester[i]=note;
+	// et maintenant on regarde si la gamme 
+	// à tester est un anagramme d'une gamme
+	for (int k=0;k<12;k++) {
+	  if (are_anagrammes(gamme_a_tester,gammes[k],7)) return k;
+	  // il faut toujours être responsable de quelqu'un ou de quelquechose
+	  // si Alice se suicide, elle veut qu'on dise qu'elle s'est suicidée parce que c'était cool.
+	  // bref, c'est une chipie et une sale gosse
+	  // si la radio ne me touchait pas, je ne l'écouterais pas, donc je ne l'écoute que parce qu'elle me touche
 					}
 				}
 			}
@@ -11168,20 +11174,26 @@ public:
     this->current=this->base;
   }
   void down(int numchildren) {
+
     current = current->children->element(numchildren);//descend par la numchildren ième node
+    if (current==NULL) {
+      printf("...\n");
+      //current=new Node<T>(val);
+    }
   }
   void add(int num, T *val) {
     // un arbre c'est un arbre de nodes, en chaque node il y a un élement, donc un pointeur vers un élément, ce pointeur
     // s'appelle element, il y a aussi une liste des 4 enfants du noeud en question, cette liste est une liste dont le ptr de chaque maille
     // pointe vers une nouvelle node ou vers NULL, quand j'ajoute une valeur
     // donc pour ajouter un noeud à la ième branche, je descend par cette branche
-    down(num);
     // ce qui modifie la valeur de current
     // et je crée une nouvelle node, à la création de la nouvelle node, 4 branches sont crées qui en émergent et pointent vers des noeuds
     // nuls
-    current=new Node<T>(val);
+    //current=new Node<T>(val);
+    current->children->element(i)=new Node<T>(val);
   }
   void add(T *val) {//le add ne modifie pas current
+    //current=new Node<T>(val);
     current->children->ajouter(new Node<T>(val));
   }
   void parcours_affiche(Node<T> *node, int profondeur) {
@@ -11196,9 +11208,7 @@ public:
 
   }
 
-  // alt-W pour copier une zone dans le presse papier sous emacs
-  // ctrl-W pour l'effacer
-  // et ctrl-Y pour la yanker
+
   void affiche() {
     parcours_affiche(base, 0);
   }
@@ -11229,14 +11239,7 @@ public:
     current = base;
     return (cpfidlibdsp(base,-1,i));
   }
-  // ce n'est pas une feuille que je cherche, c'est le père d'une feuille,
-  // autrement dit je cherche le pere d'une feuille issu de la ième branche
-  // de son père, autrement dit, j'ai un arbre avec des feuilles et des branches
-  // je veux une zone bien particulière parce que toutes les feuilles sont nulles, mais quand 
-  // feuille est nulle elle vient d'un parent et la bizarrement je ne vois pas à quel endroit 
-  // je descend dans l'arbre, ah, en fait node , c'est le parent donc je veux écrire quelquechose
-  // dans ma fonction parce que je veux avoir le parent dans les arguments et le parent c'est current
-  // donc j'ai le parent dans les arguments 
+
   int cpfidlibdsp2(Node<T> *node, int ifrom, int isearched, Node<T> *parent) {
     Maille<Node<T>> *p;
     current = node;
@@ -11253,13 +11256,6 @@ public:
   int cherche_premiere_feuille_donc_le_pere_est_issu_de_la_i_eme_branche_de_son_pere(int i) {
     // cpfidlibdsp2(base,-1, i, Node<T> *parent) {    
   }
-  // return 1 si il l'a trouvé et current pointe dessus
-  //		int cherche_premier_rammeau_ayant_pour_base_de_l_apex_un_noeud_comportant_i_enfant(int i) 
-  //			current = base;
-  //			return (cpfidlibdsp2(base,-1,i));
-  //		}
-	
-	
 };
 class TestTree {
 public:
@@ -11275,11 +11271,6 @@ public:
     exit(1);
   }
 };
-//TestTree *testtree=new TestTree();
-// Tout est methode ou donnée.
-// J'adore mon ordi.
-// J'adore mon éditeur.
-// J'adore le c++.
 class VecteurB {
 public:
   float x;
@@ -11315,9 +11306,16 @@ public:
       base=tree->base;
       //tree->ajouter_rameau();
       printf("lala\n");
+      tree->down(0);
       tree->add(1,new VecteurB(0,0,0,0.1,0.1,0));
       printf("lala\n");
-      //tree->down(1);
+      tree->down(1);
+      tree->add(new VecteurB(0,0,0,0.1,0.1,0));
+      printf("holala\n");
+      tree->down(0);
+      printf("lalala...\n");
+      tree->add(new VecteurB(0,0,0,0.1,0.1,0));
+      printf("hihi\n");
       //  tree->add(new VecteurB(0,0,0,0.1,0.1,0));
       //tree->ajouter_rameau();//on ajoute un rameau terminal
       
@@ -11390,11 +11388,14 @@ public:
 	//printf("%d\n",(int)(*(node->element)));
 
 	VecteurB *vbparent=(VecteurB*)(parent->element);//à chaque noeud de l'arbre (qui n'est pas une feuille
+	printf("quel drôle d'animal\n");
 	float xep=vbparent->xe;
 	float yep=vbparent->ye;
 	float zep=vbparent->ze;
 	glVertex3f(xep,yep,zep);
 	VecteurB *vbcurrent=(VecteurB*)(node->element);
+	printf("quel étonnante créature\n");
+	// "je veux que tu saches qu'à chaque fois que je pense à toi, je me sens beaucoup mieux, je me déleste de tous mes soucis et ça me fait vraiment du bien"
 	float xvc=vbcurrent->x;
 	float yvc=vbcurrent->y;
 	float zvc=vbcurrent->z;
@@ -11408,7 +11409,7 @@ public:
       Maille<Node<VecteurB>> *p;
       printf("je développe mon code, le déroulement l'a t'il amené jusque là2\n");
       
-      if (node->is_rameau()) return;// alors un rameau c'est un noeud dont émerge 4 branches qui donnent sur des noeuds dont les éléments pointent vers null au lieu de VecteurB
+      //if (node->is_rameau()) return;// alors un rameau c'est un noeud dont émerge 4 branches qui donnent sur des noeuds dont les éléments pointent vers null au lieu de VecteurB
 
       
       
@@ -11422,8 +11423,11 @@ public:
 
       while (p!=NULL) {//je développe mon code
 	
-	printf("je développe une méthode, cette ligne est elle atteinte ?\n");
-	parcours_affiche(p->ptr, node);
+
+	if (p->ptr->element!=NULL) {
+	  printf("je développe une méthode, cette ligne est elle atteinte ? %f\n",((VecteurB*)(p->ptr->element))->xe);
+	  parcours_affiche(p->ptr, node);
+	}
 	p=p->suivant;
        }
       printf("je développe mon code, le déroulement l'a t'il amené jusque là, à priori non\n");
