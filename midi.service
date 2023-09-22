@@ -1,0 +1,9 @@
+[Unit]
+Description=Initialise colormusic
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sudo /home/pi/prg/colormusic/test.sh midi1 %I
+#ExecStart=/home/pi/prg/colormusic/synesthezyx&
+ExecStop=/usr/bin/sudo /home/pi/prg/colormusic/stop
+#ExecStop=/usr/bin/sudo /usr/bin/killall -INT synesthezyx

@@ -1,0 +1,9 @@
+[Unit]
+Description=Launch reglage
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sudo /home/pi/prg/colormusic/is_keyboard.sh
+#ExecStart=/home/pi/prg/colormusic/synesthezyx&
+ExecStop=/usr/bin/sudo /usr/bin/killall -INT is_keyboard
+#ExecStop=/usr/bin/sudo /usr/bin/killall -INT synesthezyx

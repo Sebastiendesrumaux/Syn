@@ -1,0 +1,1 @@
+/usr/bin/xdpyinfo | /bin/grep dimension | /bin/sed 's/ //g' | /bin/sed 's/dimensions://' | awk -F"x" '{print $2 }' | sed 's/pi//' >/home/pi/prg/colormusic/dimY

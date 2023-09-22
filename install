@@ -1,0 +1,81 @@
+#alors udev install midi.service qui lance test.sh dans /home/pi/prg/colormusic
+#qui lance sudo ./run et ensuite quand X est lancé il y a un killall -USR2 synesthezyx
+
+sudo apt-get update
+sudo apt-get install libasound2-dev
+cd /home/pi/prg/colormusic/
+gcc reglage.c -o reglage
+cd /home/pi/prg/colormusic/PIGPIO
+sudo make clean
+sudo make
+sudo make install
+cd /home/pi/prg/colormusic
+sudo cp midi.service /etc/systemd/system/midi.service
+sudo cp keyboard.service /etc/systemd/system/
+
+sudo cp 98-midi-zyx.rules /etc/udev/rules.d/98-midi-zyx.rules
+sudo cp 100-usb-keyboards.rules /etc/udev/rules.d
+gcc is_keyboard.c -o is_keyboard
+sudo cp rc.local /etc/rc.local
+sudo cp .profile ~/.profile
+
+sudo systemctl enable midi.service
+sudo systemctl enable keyboard.service
+
+sudo systemctl start midi.service
+sudo systemctl status midi.service
+udevadm monitor --environment --udev
+# installation du neopixel
+sudo apt-get update
+sudo apt-get install build-essential python-dev git scons swig
+cd /home/pi/prg/neopixel/rpi_ws281x 
+scons
+cd python
+sudo python setup.py install
+
+#installation du oled
+cd /home/pi/prg/colormusic
+sudo cp modules /etc/modules
+cd /home/pi/prg/aff_oled
+sudo make clean
+sudo make
+cd examples
+make
+
+#installation des servos
+cd /home/pi/prg/colormusic
+sudo cp 99-pololu.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+
+sudo apt-get install libusb-1.0-0-dev
+
+#sudo apt-get install mono-devel
+
+git clone https://github.com/pololu/pololu-usb-sdk.git
+cd cd pololu-usb-sdk/
+make
+
+cd /home/pi/prg/colormusic
+
+#git clone https://github.com/papabricole/Pololu-Maestro.git
+#sudo apt-get install qtcreator
+#sudo apt-get install qt5-qmake
+#sudo apt-get install qt5-default
+#cd ~/prg/colormusic/Pololu-Maestro/libusc
+#cp /usr/include/libusb-1.0/libusb.h .
+#qmake
+#make
+#sudo cp /home/pi/prg/colormusic/Pololu-Maestro/libusc/libusc.so* /usr/local/lib
+#sudo ln -s /usr/lib/arm-linux-gnueabihf/libusb-1.0.so /usr/lib/arm-linux-gnueabihf/libusb.so
+
+#retire le prompt / autologin
+cp  /lib/systemd/system/getty@.service /lib/systemd/system/getty@.service.bak
+nano cp getty@.service /lib/systemd/system/
+
+#désactive le lancement automatique de X
+sudo systemctl set-default multi-user.target
+
+sudo apt-get install libglew-dev
+cp lxterminal.desktop /root/.config/autostart
+cp wiktio.desktop /root/.config/autostart
+sudo apt install vim

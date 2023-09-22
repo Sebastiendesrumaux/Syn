@@ -1,0 +1,40 @@
+#!/bin/bash
+mount /dev/sda1 /media/key
+cp /media/key/i1/*.jpg /home/pi/prg/colormusic/img/i1
+cp /media/key/i2/*.jpg /home/pi/prg/colormusic/img/i2
+cp /media/key/i3/*.jpg /home/pi/prg/colormusic/img/i3
+cp /media/key/i4/*.jpg /home/pi/prg/colormusic/img/i4
+cp /media/key/i5/*.jpg /home/pi/prg/colormusic/img/i5
+cp /media/key/i6/*.jpg /home/pi/prg/colormusic/img/i6
+cp /media/key/i7/*.jpg /home/pi/prg/colormusic/img/i7
+cp /media/key/i8/*.jpg /home/pi/prg/colormusic/img/i8
+cp /media/key/i9/*.jpg /home/pi/prg/colormusic/img/i9
+cd /home/pi/prg/colormusic/img/i1
+[ -d "/media/key/i1" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i2
+[ -d "/media/key/i2" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i3
+[ -d "/media/key/i3" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i4
+[ -d "/media/key/i4" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i5
+[ -d "/media/key/i5" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i6
+[ -d "/media/key/i6" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i7
+[ -d "/media/key/i7" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i8
+[ -d "/media/key/i8" ] && /usr/bin/python ../cv6448.py
+cd /home/pi/prg/colormusic/img/i9
+[ -d "/media/key/i9" ] && /usr/bin/python ../cv6448.py
+
+mkdir /tmp/up
+cp /media/key/upgrade.tar.gz /tmp/up
+cd /tmp/up
+tar -zxvf upgrade.tar.gz
+./r.sh
+cd /
+rm -Rf /tmp/up
+rmdir /tmp/up
+
+

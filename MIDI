@@ -1,0 +1,4 @@
+client 14: 'Midi Through' [type=noyau]
+    0 'Midi Through Port-0'
+client 128: 'LightOrgan' [type=utilisateur,pid=4965]
+    0 'listen:in       '

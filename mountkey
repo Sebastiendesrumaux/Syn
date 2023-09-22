@@ -1,0 +1,2 @@
+mkdir /media/key
+mount /dev/sda1 /media/key

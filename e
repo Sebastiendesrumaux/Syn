@@ -1,0 +1,1 @@
+emacs synesthezyx.cpp

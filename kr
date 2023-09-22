@@ -1,0 +1,2 @@
+#!/bin/bash
+kill -9 `ps aux | grep -G "[0-9] synesthezyx" | awk -F ' ' '{print $2}'`

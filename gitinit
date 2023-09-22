@@ -1,0 +1,43 @@
+git init
+git add .profile
+git add README.md
+git add 100-usb-keyboards.rules
+git add 98-midi-zyx.rules
+git add 99-pololu.rules 
+git add autocopyusbkey
+git add dimX
+git add dimY
+git add e
+git add eteint.sh
+git add focusreglage
+git add install
+git add is_keyboard.c
+git add k
+git add kill_reglage.sh
+git add kl
+git add kr
+git add Makefile 
+git add MIDI 
+git add midi.service
+git add keyboard.service
+git add lxterminal.desktop
+git add mountkey
+git add parametres.cfg
+git add putDimXinDimX
+git add putDimYinDimY 
+git add r 
+git add rc.local 
+git add rd 
+git add reader.py
+git add reglage.c
+git add reglage.sh
+git add rotateall
+git add s
+git add synesthezyx.cpp
+git add test.sh
+git add x
+git add gitinit
+git commit -m "Premier commit"
+git branch -M main
+git remote add origin https://github.com/Sebastiendesrumaux/Syn.git
+git push -u origin main

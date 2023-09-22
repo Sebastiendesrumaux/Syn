@@ -1,0 +1,27 @@
+#!/bin/bash
+cd /home/pi/prg/colormusic/img/i1
+#/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i2
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i3
+#/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i4
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i5
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i6
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i7
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i8
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i9
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i10
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i11
+/usr/bin/python ../rotate.py
+cd /home/pi/prg/colormusic/img/i12
+/usr/bin/python ../rotate.py
+
+

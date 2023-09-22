@@ -1,0 +1,2 @@
+#le script utilisé habituellement pour tuer l'appli
+sudo killall -INT synesthezyx

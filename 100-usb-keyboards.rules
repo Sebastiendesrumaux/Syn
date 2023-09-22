@@ -1,0 +1,4 @@
+SUBSYSTEM=="usb",  ATTRS{bInterfaceProtocol}=="01", ACTION=="add", RUN+="/usr/bin/sudo /bin/systemctl --no-block start keyboard.service"
+SUBSYSTEM=="usb", ACTION="remove", RUN+="/usr/bin/sudo /home/pi/prg/colormusic/kill_reglage.sh"
+#SUBSYSTEM=="usb", ACTION="remove", ENV{ID_MODEL}=="USB_Keyboard", RUN+="/usr/bin/sudo /home/pi/prg/colormusic/kill_reglage.sh"
+
