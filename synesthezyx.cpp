@@ -6259,6 +6259,9 @@ public:
     }
     return NULL;
   }
+  T *operator[](int i) {
+    return element(i);
+  }
   T *element_adresse_du_ptr(int i) {
     Maille<T> *p=premier;
     int c=0;
@@ -11135,26 +11138,30 @@ void *balls_manager_calcul_mandel(void *ptr) {
 template <class T>
 class Node {
 public:
-  Liste<Node> *children;
+  Node<T> **children;
   T *element;
   Node<T>() {
     this->element=NULL;
   }
   Node<T>(T *element) {
     this->element=element;
-    this->children=new Liste<Node>();
-    for (int i=0;i<4;i++) {
-      this->children->ajouter(new Node<T>());
-    }
+    //this->children=new Liste<Node<T>>();
+    create_rameau();
   }
   ~Node() {
     delete(children);
     delete(element);
   }
+  void create_rameau() {
+    this->children=(Node<T> **)malloc(4*sizeof(Node<T>*));
+    for (int i=0;i<4;i++) {
+      this->children[i]=new Node<T>();
+    }    
+  }
   int is_rameau() {// il y a un gros probleme je dois maintenant savoir quelle est la definition correcte du rameau
     int ok=1;
     for (int i=0;i<4;i++) {
-      ok=((ok) && (this->children->element(i)->element==NULL));//donc children->element(i), je rappelle qu'il renvoit le ptr de la ième maille
+      ok=((ok) && (this->children[i]->element==NULL));//donc children->element(i), je rappelle qu'il renvoit le ptr de la ième maille
       // et ce ptr dans le cas présent donne vers une node dont l'élément est nul 4 fois dans le cas d'un rameau
       if (!ok) break;
     }
@@ -11172,16 +11179,17 @@ public:
   Tree<T>(T *element) {
     this->base=new Node<T>(element);
     this->current=this->base;
+    
   }
   void down(int numchildren) {
-
-    current = current->children->element(numchildren);//descend par la numchildren ième node
+    current = current->children[numchildren];//descend par la numchildren ième node
+    //    current = current->children[numchildren];//descend par la numchildren ième node
     if (current==NULL) {
       printf("...\n");
       //current=new Node<T>(val);
     }
   }
-  void add(int num, T *val) {
+  void add(int num, T *element) {
     // un arbre c'est un arbre de nodes, en chaque node il y a un élement, donc un pointeur vers un élément, ce pointeur
     // s'appelle element, il y a aussi une liste des 4 enfants du noeud en question, cette liste est une liste dont le ptr de chaque maille
     // pointe vers une nouvelle node ou vers NULL, quand j'ajoute une valeur
@@ -11190,11 +11198,8 @@ public:
     // et je crée une nouvelle node, à la création de la nouvelle node, 4 branches sont crées qui en émergent et pointent vers des noeuds
     // nuls
     //current=new Node<T>(val);
-    current->children->element(i)=new Node<T>(val);
-  }
-  void add(T *val) {//le add ne modifie pas current
-    //current=new Node<T>(val);
-    current->children->ajouter(new Node<T>(val));
+    current->children[num]->element=element;
+    current->children[num]->create_rameau();
   }
   void parcours_affiche(Node<T> *node, int profondeur) {
     Maille<Node<T>> *p;
@@ -11261,13 +11266,13 @@ class TestTree {
 public:
   TestTree() {
     Tree<int> *tree=new Tree<int>(new int(0));
-    tree->add(new int(1));
-    tree->add(new int(2));
-    tree->down(1);
-    tree->add(new int(3));
-    tree->down(0);
-    tree->add(new int(4));
-    tree->affiche();
+    //    tree->add(new int(1));
+    //tree->add(new int(2));
+    //tree->down(1);
+    //tree->add(new int(3));
+    //tree->down(0);
+    //tree->add(new int(4));
+    //tree->affiche();
     exit(1);
   }
 };
@@ -11306,15 +11311,15 @@ public:
       base=tree->base;
       //tree->ajouter_rameau();
       printf("lala\n");
-      tree->down(0);
+      //tree->down(0);
       tree->add(1,new VecteurB(0,0,0,0.1,0.1,0));
       printf("lala\n");
-      tree->down(1);
-      tree->add(new VecteurB(0,0,0,0.1,0.1,0));
+      //tree->down(1);
+      tree->add(2,new VecteurB(0,0,0,0.1,0.1,0));
       printf("holala\n");
-      tree->down(0);
+      // tree->down(0);
       printf("lalala...\n");
-      tree->add(new VecteurB(0,0,0,0.1,0.1,0));
+      tree->add(3,new VecteurB(0,0,0,0.1,0.1,0));
       printf("hihi\n");
       //  tree->add(new VecteurB(0,0,0,0.1,0.1,0));
       //tree->ajouter_rameau();//on ajoute un rameau terminal
@@ -11406,7 +11411,7 @@ public:
 	
       }
       printf("je développe mon code, le déroulement l'a t'il amené jusque là1\n");
-      Maille<Node<VecteurB>> *p;
+      Node<VecteurB> *children_tab[4];
       printf("je développe mon code, le déroulement l'a t'il amené jusque là2\n");
       
       //if (node->is_rameau()) return;// alors un rameau c'est un noeud dont émerge 4 branches qui donnent sur des noeuds dont les éléments pointent vers null au lieu de VecteurB
@@ -11414,27 +11419,24 @@ public:
       
       
       
-      p=node->children->premier;
+
       printf("je développe mon code, le déroulement l'a t'il amené jusque là3\n");
       // p est une maille
       // p->ptr est une node
       //
 
-
-      while (p!=NULL) {//je développe mon code
-	
-
-	if (p->ptr->element!=NULL) {
-	  printf("je développe une méthode, cette ligne est elle atteinte ? %f\n",((VecteurB*)(p->ptr->element))->xe);
-	  parcours_affiche(p->ptr, node);
-	}
-	p=p->suivant;
-       }
+      for (int i=0;i<4;i++) {
+	  printf("je développe une méthode, cette ligne est elle atteinte ? %f\n",((VecteurB*)(node->element))->xe);
+	  if (node->children[i]->children!=NULL)
+	    parcours_affiche(node->children[i],node);
+      }
       printf("je développe mon code, le déroulement l'a t'il amené jusque là, à priori non\n");
 
     }
     
   };
+}
+using namespace tetree;
   Arbre *arbre=new Arbre();
 
 
@@ -11447,262 +11449,7 @@ float *vec(float x, float y) {
   ret[1]=y;
   return ret;
 }
-class Module {
-  float **carre;
-  float centre_carre[2];
-  // alors donc maintenant le module construit le carré, mais a t'on un carré à la base de l'arbre
-public:
-  Module(Module *parent, int deg) {
-    if (parent==NULL) {
-      carre=(float**)malloc(4*sizeof(float*));
-      for (int i=0;i<4;i++) {
-	carre[i]=(float*)malloc(3*sizeof(float));
-				}
-//replace dans vim :.,$s/foo/bar/gc ("." debut du range : ligne en cours "," parce que c'est un range, 
-//										"$" pour la dernière ligne en range pour global, c pour confirm)
-      carre[0][0]=-1; carre[0][1]=1; 
-      carre[1][0]=1; carre[1][1]=1;
-      carre[2][0]=1; carre[2][1]=-1;
-      carre[3][0]=-1; carre[3][1]=1;
-	
-    } else {
-      carre=construit_carre(parent->cote_carre(deg),parent->centre_carre);
-    }
-  }
-		float **cote_carre(int deg) {
-			// cette méthode renvoit le degième coté du carré
-			// alors c'est très simple en fait, je me dis que quand je me concentre
-			// pour coder, je fais taire mes voix intérieures et donc je leur fais
-			// du mal et comme j'ai besoin de silence pour penser j'ai tendance
-			// à beaucoup les écouter dans ces cas là, mais quand j'écris une ligne
-			// de code je me consacre à autre chose qu'à moi même en fait et c'est 
-			// peut être ce qui me révolte, j'avais besoin d'écrire cela. qu'est ce 
-			// qui me travaille en fait, rien, je vais bien... et donc pourquoi je fais
-			// cela, je ne travaille pas, je joue, ok je joue... donc c'est très bien
-			// et là, le jeu va consister en quoi, à rajouter une lettre ou un mot,
-			// à la ligne suivante, donc j'ai rajouté 2 lignes, c'était cool, et maintenant
-			// le jeu consiste à trouver la ligne suivante, alors comment vais je la trouver,
-			// j'ai un coté, c'est cool, c'est 2 coordonnées, donc 2 zones de la mémoires
-			// contenant 2 floats, donc je dois les allouer, donc je les alloue en utilisant
-			// la fonction malloc qui retourne un pointeur void que je dois caster, c'est à dire,
-			// dont je dois définir l'étendue de la zone mémoire qu'ils adressent mais pour cela
-			// je dois arrêter de me dire que je vais être animateur sur libre antenne, ou pas
-			// d'ailleurs, je peux très bien ambitionner de donner des cours d'informatique
-			// sur libre antenne, ok, pourquoi pas... donc la fonction malloc retourne un pointeur
-			// qui est dit void, autrement dit, c'est une adresse en mémoire d'un point, mais 
-			// nous on veut l'adresse d'un segment, et là ce segment doit être suffisament grand
-			// pour pouvoir coder un nombre à virgule, dans le langage c, c'est 4 octets. donc la 
-			// boucle suivante reserve 2 espaces mémoires de 2 * 4 octets accessibles par 2 pointeurs
-			// qui sont des objets qui codent à la fois une adresse et la taille de la zone qu'ils 
-			// couvrent, donc l'instruction
-			float **cote;
-			// déclare que coté est un pointeur sur un pointeur
-			// et l'instruction
-			cote = (float**)malloc(sizeof(float*)*2);
-			// alloue la mémoire nécessaire au stockage de 2 adresses de 2 adresses de nombres à virgule
-			// et l'instruction
-			for (int i=0;i<2;i++) {
-				// exécute 2 fois l'instruction suivante, en faisant varier le contenu de la mémoire 
-				// accessible par i,
-				//  l'instruction suivante alloue la mémoire pour 2 nombres à virgules, et renvoit leur adresse
-				cote[i]=(float*)malloc(sizeof(float)*2);
-			}
-			// maintenant, nous allons stocker dans le premier emplacement mémoire (qui est à la première adresse
-			// de la première adresse) quelquechose, ce quelquechose, c'est la coordonnées en x d'une des extrémité
-			// du coté
-			cote[0][0]=carre[deg][0];// le x du degième côté du carré
-			cote[0][1]=carre[deg][1];
-			cote[1][0]=carre[(deg+1)%5][0];
-			cote[1][1]=carre[(deg+1)%5][1];
-			// l'instruction suivante indique que la variable cote est retournée par la fonction quand on l'appelle
-			return cote;
 
-		}
-		int pousse(int val) {
-		}
-		int depousse(int val) {
-		}
-		// c'est l'effort qui compte
-		void affiche() {
-			glMatrixMode(GL_MODELVIEW);
-			glPushMatrix();
-			glLoadIdentity();
-			glBegin(GL_LINE_STRIP);
-				glColor3ub(255,255,255);
-				for (int i=0;i<4;i++) {
-					glVertex2fv(carre[i]);
-				}
-			glEnd();
-			glTranslatef(0,0,-3);
-			glPopMatrix();
-		}
-		// construit un carré pointe posée sur le coté d'un carré de centre C
-		// il ne faut pas chercher le plaisir mais quand il est là, il ne faut pas bouder son plaisir
-		// et encore moins son bien être, c'est comme si je m'étais préparé un énorme joint à la plage
-		// et je le savoure maintenant en recopiant ce que j'y ai écrit
-		float **construit_carre(float **cAB, float *C) {
-			float *A=cAB[0]; // les coordonnées du point gauche du côté du carré
-			// je rafine
-			float *B=cAB[1]; // les coordonnées du point droit du côté du carré
-			float AB[2];
-			AB[0]=B[0]-A[0];
-			AB[1]=B[1]-A[1];
-			#define bary2(A,B,O) for (int i=0;i<2;i++) O[i]=(A[i]+B[i])/2
-			float O[2]; bary2(A,B,O); // O est le barycentre de AB
-
-			float CO[2];	// C est le centre du carré d'ou provient le côté sur lequel on construit le nouveau carré		
-			CO[0]=O[0]-C[0]; CO[1]=O[1]-C[1];
-			float *nor=CO;
-			normalize2(nor); // nor est la normale à AB pointant vers l'extérieur du carré
-			float l=sqrt(AB[0]*AB[0] + AB[1]*AB[1]); // l est la longueur de AB
-			float d=l*sqrt(2); // d est la longueur de la diagonale du carré
-			float P[2]; // P est le point le plus haut du carré que l'on va construire
-			P[0]=O[0]+d*nor[0];
-			P[1]=O[1]+d*nor[1];
-			float OP[2];
-			OP[0]=P[0]-O[0];
-			OP[1]=P[1]-O[1];
-			float I[2];// I est le centre du carré que l'on construit, l'intersection des diagonales
-			I[0]=(O[0]+P[0])/2;
-			I[1]=(O[1]+P[1])/2;
-			float OB[2]; OB[0]=B[0]-O[0]; OB[1]=B[1]-O[1];
-			normalize2(OB);
-			float *nOB=OB;
-			// R est le point du carré crée à droite de I, quand le carré est au dessus de son carré parent
-			float R[2]; R[0]=I[0]+d*nOB[0]; R[1]=I[1]+d*nOB[1];
-			// Q est de l'autre côté
-			float Q[2]; Q[0]=I[0]-d*nOB[0]; Q[1]=I[1]-d*nOB[1];
-			float **square=(float**)malloc(4*sizeof(float*));
-			for (int i=0;i<4;i++) {
-				square[i]=(float*)malloc(3*sizeof(float));
-			}
-			square[0][0]=O[0]; square[0][1]=O[1]; 
-			square[1][0]=R[0]; square[1][1]=R[1]; 
-			square[2][0]=P[0]; square[2][1]=P[1];
-			square[3][0]=Q[0]; square[3][1]=Q[1]; 
-			return square;
-
-
-		}
-	};
-/* alors bon, j'ai un module et c'est cool, je me balade dans mon arbre et je l'affiche, donc je pars de la base
-et aprés je dessine un tetraedre à chaque noeud, je commence par un tétraèdre à la base
-*/
-}
-#define note_mauve(note) !(detecteurDeGamme->is_cette_note_fait_passer_la_gamme_dans_une_autre_gamme(detecteurDeGamme->une_gamme_possible_ou_DO(),note))
- 
-	using namespace tetree;
-class TetraMauve {
-	public:
-
-		int onote=-1;
-		int onote_time=0;
-		Tree<Module> *tree;
-
-		TetraMauve () {
-
-			tree=new Tree<Module>(new Module(NULL,-1));
-			for (int i=0;i<4;i++) 
-				tree->current->children->ajouter(NULL);
-			
-				// donc on commence avec un module à la base de l'arbre, et une liste de 4 éléments qui 
-				// sont des ptr null donc en fait on a un beau dessin mais on a la flemme de le faire
-				// et c'est tranquille et on pourrait tester pour voir au moins si c'est consistant,
-				// on aurait une peur en moins 
-				// 
-			//if (detecteurDeGamme==NULL) detecteurDeGamme=new DetecteurDeGamme();
-		}
-		void compute() {
-			if ((note_en_cours()==onote) && (note_en_cours_time()==onote_time)) {
-				return;
-			}
-
-			int la_note_est_mauve=0;
-			if (note_mauve(note_en_cours())) {
-				la_note_est_mauve=1;
-			} else {
-			  detecteurDeGamme->processMuted();
-			}
-			int profondeur=0;
-			int deg;
-			for (int i=0;i<12;i++) {
-				if (notes_val_dans_l_octave[i]!=0) {
-					if (!note_mauve(i)) {
-					  deg=gamme2degres(detecteurDeGamme->une_gamme_possible_ou_DO(),i)+1;
-					  
-					} else {
-						deg=8;
-					}
-					
-					if (deg<=4) {
-						Node<Module> *np=tree->current->children->element(deg); // node pointeur
-						Module *mp = tree->current->children->element(deg)->element; // module pointeur
-						// np pointe vers le degrès ième enfant du noeud en cours
-						// mp pointe vers le module présent en np
-						Module *parent = tree->current->element;
-						// et le parent de l'enfant pointe vers l'élement en cours
-						if (mp==NULL) {
-							mp=new Module(parent,deg);
-							for (int i=0;i<4;i++) 
-								np->children->ajouter(NULL);
-	
-							// alors quand on appuie sur plusieurs note de l'accord
-							// par exemple 0 1 2 3, il cree un tetraedre sur la face 0, puis sur la face 1 du tetraedre précédent
-							// puis sur la face 2 du tetraedre précédent et enfin sur la face 3 du tétraedre précédent
-						} 
-						/*
-						else {
-							if (tree->current->element->pousse(notes_val_dans_l_octave[i])) break;
-							else tree->down(deg);
-						}
-						*/
-						// si on joue 0 1 3 3, on fait pousser la face 0 du premier tetraedre
-						// si, elle est au max, on descend par 0, on fait pousser la 1, si elle
-						// est au max, on descend par 1, on fait pousser la 3, si elle est au max
-						// on descend par 3, on fait pousser 3
-						// si on joue 1 2 2 3, on fait pousser la face 1, si elle n'existe pas, on la crée, si elle est au max
-						// on descend par 1, on fait pousser la face 2, si elle est au max, 
-						// on descend par 2 etc..
-						// on fait pousser le tetraedre de la deg-ième face	
-					} else {
-						// si le degrés est supérieur à 4, on va chercher la première feuille issue de la deg ieme
-						// branche de son père
-						Node<Module> *sauvecurrent=tree->current;
-//					    if (tree->cherche_premiere_feuille_issue_d_un_noeud_emergeant_de_la_ieme_branche_de_son_pere(deg)==1) {
-//							delete(tree->current->element);
-//						}
-						tree->current=sauvecurrent;
-						/*
-						//chercher la première feuille en deg-4 et la dépousser
-						if (tree->current->element!=NULL) {
-							if (!(tree->current->element->depousse(notes_val_dans_l_octave[i])) && 
-									(tree->current->children->is_vide())) {
-								//tree->current->supprime();
-							}
-						} 
-						*/
-					}
-
-					tree->down(deg);// alors on descend si on peut descendre
-
-				}
-			}
-
-			onote=note_en_cours();
-			onote_time=note_en_cours_time();
-
-		}
-		void affiche() {
-
-		}
-		void process () {
-			compute();
-			affiche();
-		}
-
-			
-	
-};
   //emacs C-M b et C-M f : goto begin et end expression  
 void calcul_matrice_deplacement_en_fonction_des_notes_et_de_la_partnum() {
 	float roulotte;
