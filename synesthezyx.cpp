@@ -36,7 +36,7 @@ int new_txt_video_clip=0;
 int dbg=0;
 int affiche_pastilles=1;	
 int affiche_poles=0;	
-int auto_change=0;
+int auto_change=1;
 int leds=0; //parce que quand on lance gdb, on ne lance pas la partie python et donc le programme ne décolle pas
 //on pourrait tester en lançant la partie python avec un exec mais on a la flemme
 //donc si tu veux remettre les leds quand le programme est debugué, n'hésite pas à repasser ça a 1
@@ -108,7 +108,7 @@ int haptique=0;
 
 int debug=0;
 
-int midi_simulation=1; // pour jouer automatiquement 
+int midi_simulation=0; // pour jouer automatiquement 
 int midi_simulation_sleep_time=5;//20; // le temps entre chaque note random
 
 char **gargv;
@@ -11309,17 +11309,9 @@ public:
     Arbre() {
       tree=new Tree<VecteurB>(new VecteurB(0,0,0,0,0.1,0));
       base=tree->base;
-      //tree->ajouter_rameau();
-      printf("lala\n");
-      //tree->down(0);
       tree->add(1,new VecteurB(0,0,0,0.1,0.1,0));
-      printf("lala\n");
-      //tree->down(1);
-      tree->add(2,new VecteurB(0,0,0,0.1,0.1,0));
-      printf("holala\n");
-      // tree->down(0);
-      printf("lalala...\n");
-      tree->add(3,new VecteurB(0,0,0,0.1,0.1,0));
+      tree->add(2,new VecteurB(0,0,0,0.2,0.1,0));
+      tree->add(3,new VecteurB(0,0,0,0.3,0.1,0));
       printf("hihi\n");
       //  tree->add(new VecteurB(0,0,0,0.1,0.1,0));
       //tree->ajouter_rameau();//on ajoute un rameau terminal
@@ -11340,12 +11332,12 @@ public:
       
     }
     void affiche() {
-	
+      /*	
       glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
       glLoadIdentity();
       glTranslatef(0,0,-3);
-      
+      */
       parcours_affiche(base, 0); // je développe mon code
       /*
       float theta=M_PI/4;
@@ -11365,8 +11357,8 @@ public:
       }
       glEnd();
       */
-      glPopMatrix();
-      exit(0);
+      //glPopMatrix();
+      //      exit(0);
     }
 
   private:
@@ -11410,17 +11402,13 @@ public:
 	glEnd();
 	
       }
-      printf("je développe mon code, le déroulement l'a t'il amené jusque là1\n");
+
       Node<VecteurB> *children_tab[4];
-      printf("je développe mon code, le déroulement l'a t'il amené jusque là2\n");
+
       
       //if (node->is_rameau()) return;// alors un rameau c'est un noeud dont émerge 4 branches qui donnent sur des noeuds dont les éléments pointent vers null au lieu de VecteurB
 
       
-      
-      
-
-      printf("je développe mon code, le déroulement l'a t'il amené jusque là3\n");
       // p est une maille
       // p->ptr est une node
       //
