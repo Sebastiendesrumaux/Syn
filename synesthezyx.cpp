@@ -110,7 +110,7 @@ int haptique=0;
 
 int debug=0;
 
-int midi_simulation=0; // pour jouer automatiquement 
+int midi_simulation=1; // pour jouer automatiquement 
 int midi_simulation_sleep_time=5;//20; // le temps entre chaque note random
 
 char **gargv;
@@ -11155,6 +11155,7 @@ public:
     delete(element);
   }
   void create_rameau() {
+    printf("create rameau\n");
     this->children=(Node<T> **)malloc(4*sizeof(Node<T>*));
     for (int i=0;i<4;i++) {
       this->children[i]=new Node<T>();
@@ -11178,12 +11179,14 @@ class Tree {//je code un buisson plutôt qu'un arbre, car à chaque noeud et don
 public:
   Node<T> *current;
   Node<T> *base;
+  Node<T> *parent=NULL;
   Tree<T>(T *element) {
     this->base=new Node<T>(element);
     this->current=this->base;
     
   }
   void down(int numchildren) {
+    parent = current;
     current = current->children[numchildren];//descend par la numchildren ième node
     //    current = current->children[numchildren];//descend par la numchildren ième node
     if (current==NULL) {
@@ -11192,15 +11195,11 @@ public:
     }
   }
   void add(int num, T *element) {
-    // un arbre c'est un arbre de nodes, en chaque node il y a un élement, donc un pointeur vers un élément, ce pointeur
-    // s'appelle element, il y a aussi une liste des 4 enfants du noeud en question, cette liste est une liste dont le ptr de chaque maille
-    // pointe vers une nouvelle node ou vers NULL, quand j'ajoute une valeur
-    // donc pour ajouter un noeud à la ième branche, je descend par cette branche
-    // ce qui modifie la valeur de current
-    // et je crée une nouvelle node, à la création de la nouvelle node, 4 branches sont crées qui en émergent et pointent vers des noeuds
-    // nuls
-    //current=new Node<T>(val);
+    printf("add\n");
+    if (current->children==NULL) printf("lkmlkmkl\n");
+    if (current->children[num]->element==NULL) printf("hmm\n");
     current->children[num]->element=element;
+    printf("lmkùmkl\n");
     current->children[num]->create_rameau();
   }
   void parcours_affiche(Node<T> *node, int profondeur) {
@@ -11227,57 +11226,9 @@ public:
       delete(p);
     }
   }
-  int cpfidlibdsp(Node<T> *node, int ifrom, int isearched) {
-    Maille<Node<T>> *p;
-    current = node;
-    p=node->children->premier;
-    if ((p==NULL) && (ifrom==isearched) ) return 1;
-    int i=0;
-    while (p!=NULL) {
-      cpfidlibdsp(p->ptr,i,isearched);
-      p=p->suivant;
-      i++;
-    }
-    return -1;
-  }
-			
-  // return 1 si il l'a trouvé et current pointe dessus
-  int cherche_premiere_feuille_issue_de_la_ieme_branche_de_son_pere(int i) {
-    current = base;
-    return (cpfidlibdsp(base,-1,i));
-  }
 
-  int cpfidlibdsp2(Node<T> *node, int ifrom, int isearched, Node<T> *parent) {
-    Maille<Node<T>> *p;
-    current = node;
-    p=node->children->premier;
-    if ((p==NULL) && (ifrom==isearched) ) return 1;
-    int i=0;
-    while (p!=NULL) {
-      cpfidlibdsp(p->ptr,i,isearched,current);
-      p=p->suivant;
-      i++;
-    }
-    return -1;
-  }
-  int cherche_premiere_feuille_donc_le_pere_est_issu_de_la_i_eme_branche_de_son_pere(int i) {
-    // cpfidlibdsp2(base,-1, i, Node<T> *parent) {    
-  }
 };
-class TestTree {
-public:
-  TestTree() {
-    Tree<int> *tree=new Tree<int>(new int(0));
-    //    tree->add(new int(1));
-    //tree->add(new int(2));
-    //tree->down(1);
-    //tree->add(new int(3));
-    //tree->down(0);
-    //tree->add(new int(4));
-    //tree->affiche();
-    exit(1);
-  }
-};
+
 class VecteurB {
 public:
   float x;
@@ -11307,26 +11258,29 @@ public:
     Node<VecteurB> *base;
     Tree<VecteurB> *tree;
   public:
-
+    // emacs bookmark set : C-x r m
+    // emacs bookmark jump : C-x r b
     Arbre() {
       tree=new Tree<VecteurB>(new VecteurB(0,0,0,0,0.1,0));
       base=tree->base;
-      tree->add(0,new VecteurB(0,0,0, 0.4,0.1,0));
-      tree->add(1,new VecteurB(0,0,0, 0.1,0.1,0));
-      tree->add(2,new VecteurB(0,0,0, 0.2,0.1,0));
-      tree->add(3,new VecteurB(0,0,0, 0.3,0.1,0));
+      //      down(0);
+      VecteurB *vparent;
+      if (tree->parent==NULL) {
+	vparent = new VecteurB(0,0,0,0,0.1,0);
+      } else {
+	vparent = tree->parent->element;
+      }
+	
+      tree->add(0,degtovecb(0,vparent)/*new VecteurB(0,0,0, 0.4,0.1,0)*/);
+      tree->add(1,degtovecb(1,vparent)/*new VecteurB(0,0,0, 0.1,0.1,0)*/);
+      tree->add(2,degtovecb(2,vparent)/*new VecteurB(0,0,0, 0.2,0.1,0)*/);
+      tree->add(3 ,degtovecb(3,vparent)/*new VecteurB(0,0,0, 0.3,0.1,0)*/);
 
       tree->down(0);
-      tree->add(0,new VecteurB(0,0,0, 0.4,0.1,0));
-      printf("hihi\n");
-      //  tree->add(new VecteurB(0,0,0,0.1,0.1,0));
-      //tree->ajouter_rameau();//on ajoute un rameau terminal
+      tree->add(0,degtovecb(0, tree->parent->element)/*new VecteurB(0,0,0, 0.4,0.1,0)*/);
+      tree->up();/* pas du gateau quand même parce qu'il faut retrouver le parent du nouveau current qui n'est autre que son ancien parent et donc reparcourir l'arbre avec une méthode cherche_parent_du_current() */
       
-      
-      //tree->current->element=new VecteurB(0,0,0,0.1,0.1,0);
-      //tree->down(1);
-      //tree->ajouter_rameau();
-      //tree->current->element=new VecteurB(0,0,0,0.1,0.1,0);
+
     }
     void process() {
       if ((note_en_cours()!=onote) && (note_en_cours_time()!=onote_time)) {
@@ -11367,16 +11321,29 @@ public:
       //      exit(0);
     }
 
+
+
+
+
+      
+
+      
+
   private:
     // C-w : emacs kill-region
-    VecteurB *degtovecb(int i, VecteurB *vec) {
+    // M-w : emacs copy-region
+    VecteurB *degtovecb(int i, VecteurB *parent) {
       float alpha[4]={0,M_PI/2,2*M_PI/2,3/M_PI/2};
       float x,y,z;
       float theta=M_PI/4;
       x=(sqrt(2)/2)*cos(alpha[i]);
       y=sin(theta);
       z=(sqrt(2)/2)*sin(alpha[i]);
-      VecteurB *retvec=new VecteurB(vec->xe,vec->ye,vec->ze,x,y,z);
+      VecteurB *retvec;
+      if (parent==NULL)
+	retvec=new VecteurB(0,0,0,x,y,z);
+      else
+	retvec=new VecteurB(parent->xe,parent->ye,parent->ze,x,y,z);
       return retvec;
     }
 
