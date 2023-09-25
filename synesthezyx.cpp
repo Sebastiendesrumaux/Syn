@@ -3,6 +3,8 @@
 // alt-W pour copier une zone dans le presse papier sous emacs
 // ctrl-W pour l'effacer
 // et ctrl-Y pour la yanker
+// M-< : goto begin of buffer
+// M-> : goto end of buffer
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -11309,9 +11311,13 @@ public:
     Arbre() {
       tree=new Tree<VecteurB>(new VecteurB(0,0,0,0,0.1,0));
       base=tree->base;
-      tree->add(1,new VecteurB(0,0,0,0.1,0.1,0));
-      tree->add(2,new VecteurB(0,0,0,0.2,0.1,0));
-      tree->add(3,new VecteurB(0,0,0,0.3,0.1,0));
+      tree->add(0,new VecteurB(0,0,0, 0.4,0.1,0));
+      tree->add(1,new VecteurB(0,0,0, 0.1,0.1,0));
+      tree->add(2,new VecteurB(0,0,0, 0.2,0.1,0));
+      tree->add(3,new VecteurB(0,0,0, 0.3,0.1,0));
+
+      tree->down(0);
+      tree->add(0,new VecteurB(0,0,0, 0.4,0.1,0));
       printf("hihi\n");
       //  tree->add(new VecteurB(0,0,0,0.1,0.1,0));
       //tree->ajouter_rameau();//on ajoute un rameau terminal
@@ -12010,7 +12016,7 @@ class Tetraedre {
 		float D[3];
 
 		Tetraedre() {
-			float b=a / (2.0*sqrt(2));
+		float b=a / (2.0*sqrt(2));
 
 			float dhf[3]; setvec(-b,b,b,dhf);
 			float gbf[3]; setvec(b,-b,b,gbf);
