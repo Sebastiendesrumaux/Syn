@@ -1,10 +1,28 @@
 // -*- coding: utf-8 -*-
 //emacs M-g g goto-line
-// alt-W pour copier une zone dans le presse papier sous emacs
-// ctrl-W pour l'effacer
-// et ctrl-Y pour la yanker
-// M-< : goto begin of buffer
-// M-> : goto end of buffer
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim go to bookmark 'a
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
+//vim bookmark ma
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -34,19 +52,18 @@ char txt_video_clip[256];
 char otxt_video_clip[256];
 int new_txt_video_clip=0;
 #define setcolor(i) glColor3ub(comp(i))
-//compilation-mode
 int dbg=0;
 int affiche_pastilles=1;	
 int affiche_poles=0;	
-int auto_change=0;
+int auto_change=1;
 int leds=0; //parce que quand on lance gdb, on ne lance pas la partie python et donc le programme ne décolle pas
 //on pourrait tester en lançant la partie python avec un exec mais on a la flemme
 //donc si tu veux remettre les leds quand le programme est debugué, n'hésite pas à repasser ça a 1
-int wordsdisplay=1;
+int wordsdisplay=0;
 #define firstpart -17
 #define lastpart 13
 //int partnum=firstpart;
-int partnum=-17;
+int partnum=13; //-16;
 int prevpart=-300000;
 //0 : la courbe en 3D
 unsigned long int vbl=0;
@@ -110,7 +127,7 @@ int haptique=0;
 
 int debug=0;
 
-int midi_simulation=1; // pour jouer automatiquement 
+int midi_simulation=0; // pour jouer automatiquement 
 int midi_simulation_sleep_time=5;//20; // le temps entre chaque note random
 
 char **gargv;
@@ -332,7 +349,7 @@ public:
     return(this);
   }
 };
-
+// ne pas lire la foutue structure suivante
 typedef struct {
   float x;
   float y;
@@ -340,7 +357,7 @@ typedef struct {
   int touched;
 } pastilles;
 
-
+// en revanche celle là, elle est tellement COLOREE !!!!
 typedef struct {
   double r;       // a fraction between 0 and 1
   double g;       // a fraction between 0 and 1
@@ -465,13 +482,58 @@ rgb hsv2rgb(hsv in) {
   return out;
 }  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//une couleur
 typedef struct {
   unsigned char r; 
   unsigned char v;  
   unsigned char b;  
   unsigned char w;  
 } couleur;
-//une couleur irréelle
+
 couleur composantes[12];
 float tabcomposantes[12][3];
 float tabcomposantesa[12][4];
@@ -493,7 +555,9 @@ void make_composantes_rainbow() {
   rgb colrgb;  
   hsv colhsv;  
   for (int i=0;i<12;i++) {    
+///////////////////////////////////////
     colhsv.h=360.0*((float)(i)/12);    
+///////////////////////////////////////////
     colhsv.s=1.0;    
     colhsv.v=1.0;    
     colrgb = hsv2rgb(colhsv);    
@@ -508,7 +572,9 @@ public:
   int nb_couleurs;
   unsigned char (*couleurs)[4];
   Palette(float debuth, float finh, int nb_couleurs, unsigned char alpha) {			
+  ////////////////////////////////////////////////////////////
     /* crée une palette en prenant une portion de h dans hsv */
+	///////////////////////////////////////////////////////////////
     rgb colrgb;
     hsv colhsv;
     this->nb_couleurs=nb_couleurs;
@@ -546,6 +612,7 @@ public:
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
     glBegin(GL_LINES);
     {
       float incx = 2.0 / this->nb_couleurs;
@@ -555,18 +622,19 @@ public:
       // autrement dit, en langage informatique beaucoup plus précis et clair
       float x = -1;
       for (int i=0; i< this->nb_couleurs; i++) {
-	// on définit la couleur du segment à la ligne suivante
-	glColor4ub(couleurs[i][0], couleurs[i][1], couleurs[i][2], couleurs[i][3]);
-	glVertex2f(x, 0.3);
-	glVertex2f(x,-0.3); 
-	x += incx;
+		// on définit la couleur du segment à la ligne suivante
+		glColor4ub(couleurs[i][0], couleurs[i][1], couleurs[i][2], couleurs[i][3]);
+		glVertex2f(x, 0.3);
+		glVertex2f(x,-0.3); 
+		x += incx;
       }
     }
     glEnd();
+
     glPopMatrix();
+
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
   }
 };
 
@@ -582,17 +650,9 @@ public:
 //9 la si do# re mi fa# sol#
 //10 la# do re re# fa sol la  
 //11 si do# re# mi fa# sol# la#
+
 int gamme_en_cours=0;
 int indexgamme=0;
-
-///////////////////////////////////////////////////////////////////////////
-
-//#include "pcm.c"
-
-//////////////////////////////////////////////////////////////////////////
-
-
-
 void init_gammes() {
 /*
   gammes[DO]={DO,RE,MI,FA,SOL,LA,SI};
@@ -610,151 +670,71 @@ void init_gammes() {
 */
 }
 
+// ne pas s'en faire, jusque là, tout va bien
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 float myrand() {
   return (float)rand() / RAND_MAX;
 }
 
-int detect_gamme(int note) {
-  // une première tentative pour faire un détecteur de gamme musicale
-  // mais je n'ai pas pris en compte le fait que par exemple dans une gamme
-  // de sol majeur, si on joue plus souvent le fa que le fa dièse alors
-  // on arrive dans une gamme de do majeur
-  // je ne vois pas pour le moment de manière de procéder pour détecter la gamme
-  // mais c'est un problème intéressant, comment pourrais je faire, j'ai l'historique
-  // de toutes les notes jouées, supposons par exemple que je ne joue que des notes
-  // sans altération je suis dans la gamme de do majeur, supposons maintenant, que je 
-  // joue un ré dièse je ne suis plus tout à fait dans la gamme de do majeur mais je peux
-  // être dans la gamme de quoi. révisons les différentes gammes.
-  // do majeur  : do ré mi fa sol la si do
-  // do# majeur : do# ré# fa fa# sol# la# do do#
-  // ré majeur  : ré mi fa# sol la si do# ré
-  // ré# majeur  : ré# fa sol sol# la# do ré ré#
-  // mi majeur : mi fa# sol# la si do# ré# mi
-  // fa majeur : fa sol la la# do ré mi fa
-  // fa# majeur : fa# sol# la# si do# re# fa
-  // sol majeur : sol la si do ré mi fa# sol
-  // sol# majeur : sol# la# do do# ré# fa sol sol#
-  // la majeur : la si do# ré mi fa# sol la 
-  // la# majeur: la# do ré ré# fa sol la la#
-  // si majeur : si do# ré# mi fa# sol# la# si 
-  
-  
-  if (note == gammes[gamme_en_cours][indexgamme]) {
-    // alors pour le moment 
-    indexgamme ++;
-    if (indexgamme == 12) {
-      fprintf(stderr,"Nouvelle gamme détectée !");
-      load_png(gamme_en_cours);
-    } 
-  } else {
-    gamme_en_cours = note;
-    indexgamme=1;
-  }
-}
-/*
-  gammes[DO]={DO,RE,MI,FA,SOL,LA,SI};
-  gammes[DOD]={DOD,RED,FA,FAD,SOLD,LAD,DO};
-  gammes[RE]={RE,MI,FAD,SOL,LA,SI,DOD};
-  gammes[RED]={RED,FA,SOL,SOLD,LAD,DO,RE};
-  gammes[MI]={MI,FAD,SOLD,LA,SI,DOD,RED};
-  gammes[FA]={FA,SOL,LA,LAD,DO,RE,MI};
-  gammes[FAD]={FAD,SOLD,LAD,SI,DOD,RED,FA};
-  gammes[SOL]={SOL,LA,SI,DO,RE,MI,FAD};
-  gammes[SOLD]={SOLD,LAD,DO,DOD,RED,FA,SOL};
-  gammes[LA]={LA,SI,DOD,RE,MI,FAD,SOLD};
-  gammes[LAD]={LAD,DO,RE,RED,FA,SOL,LA};
-  gammes[SI]={SI,DOD,RED,MI,FAD,SOLD,LAD};
-*/
-/*
-  class ChercheurDeGamme {
-  public:
-  int index;
-  int pas_dans_un_gamme=1;
-  int ordre[7][7]={2,2,1,2,2,2,1},
-  {2,1,2,2,2,1,2},
-  {1,2,2,2,1,2,2},
-  {2,2,2,1,2,2,1},
-  {2,2,1,2,2,1,2},
-  {2,1,2,2,1,2,2},
-  {1,2,2,1,2,2,2};
-  int sequence[7];
-  int ordre_possible[7];
-  int gamme_index;
-  ChercheurDeGamme() {
-  
-  }
-  void reset_ordre_possible() {
-  for (int i=0;i<7;i++) {
-  ordre_possible[i]=1;
-  }
-  }
-  void process(int note) {
-  // nouvelle note
-  if (pas_dans_une_gamme) {
-  // si on n'est pas dans une gamme, autrement dit si il a été détecté une séquence impossible à caser dans une gamme
-  sequence[0]=note;
-  // la note devient la première d'une nouvelle séquence
-  reset_ordre_possible();
-  // tous les ordres deviennent à nouveau possible
-  index=1;
-  // on prépare la place pour la note suivante
-  pas_dans_une_gamme=0;
-  // on est peut être dans une gamme
-  } else {
-  
-  for (i=0;i<7;i++) {
-  if (ordre_possible[i]) {
-  if (sequence[index] - sequence[index-1]==ordre[i][index]) ordre_possible[i]=1;
-  // regarder pour chaque ordre encore possibles si l'intervalle entre la note en cours et la note précédente 
-  // dans la séquence correspond à l'intervalle en cours dans l'ordre et mettre à jour le tableau de vérité des 
-  // ordres possibles en conséquence
-  else ordre_possible[i]=0;
-  }
-  }
-  // si tous les ordres possibles sont à zéro
-  // autrement dit si en parcourant le tableau des ordres possibles et en sortant de la boucle aprés avoir mis une 
-  // variable à 0 si l'une des valeurs est différente de 0, on est en sortie de boucle avec la variable à 1
-  int zero=1;
-  for (int i=0;i<7;i++) {
-  if (ordre_possible[index]==0)
-  zero=1;
-  else {
-  zero=0;
-  break; //on veut savoir si tous les ordres possibles sont à zéro
-  }
-  
-  }
-  index++;
-  if (zero) pas_dans_une_gamme=1;
-  }
-  // à ce stade, si la séquence de note est complète, et qu'on est dans une gamme
-  if ((index==8) && (!pas_dans_une_gamme)) {
-  mode=0;
-  for (int i=0;i<7;i++) {
-  if (ordre_possible[i]==1) break; // on cherche l'ordre possible 
-  mode++;
-  }
-  printf("On est dans une gamme, dans le mode : %i\n",mode);
-  // donc ici normalement on peut avoir la gamme en fonction de la premiere note du mode,
-  // exemple, si on est dans le mode 1 et que la première note est ré alors on est dans 
-  // la gamme de do majeur, si on dans le 2ème mode et que la première note est la 2ème note
-  // de la gamme de sol majeur autrement dit un la alors on est dans la gamme de sol majeur
-  // si on est dans le i ème mode et que la 1ère note de la sequence est la ième note d'une gamme
-  // alors on est dans cette gamme
-  starfield();
-  index=0;
-  pas_dans_une_gamme=0; 
-  } else { // on est dans une gamme
-  // on regarde si la nouvelle note jouée est dans la gamme en cours
-  // for (int i=0;i< 
-  
-  //	if (note == gammes[gamme_en_cours][indexgamme]) {
-  //starfield();
-  }
-  
-  }
-};
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
   gammes[DO]={DO,RE,MI,FA,SOL,LA,SI};
   gammes[DOD]={DOD,RED,FA,FAD,SOLD,LAD,DO};
@@ -784,6 +764,9 @@ int gamme_relative(int note) {
   if (note==LAD) return SOL;
   if (note==SI) return SOLD;
 }
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 int are_anagrammes(int *g1, int *g2, int n) {
   int *deja_trouvee = (int*) malloc(n*sizeof(int));
   for (int i=0;i<n;i++) deja_trouvee[i]=0;
@@ -791,9 +774,9 @@ int are_anagrammes(int *g1, int *g2, int n) {
     int ok=0;
     for (int j=0;j<n;j++) {
       if ((g1[i]==g2[j]) && (!deja_trouvee[j])) {
-	deja_trouvee[j]=1;
-	ok=1;
-	break;
+		deja_trouvee[j]=1;
+		ok=1;
+		break;
       }
     }
     if (!ok) { free(deja_trouvee); return 0; }
@@ -801,14 +784,9 @@ int are_anagrammes(int *g1, int *g2, int n) {
   free(deja_trouvee);
   return 1;
 }
-class TestAnagramme {
-public:
-  TestAnagramme() {
-    int g1[5]={0,1,2,3,4};
-    int g2[5]={1,0,0,3,4};
-    if (!are_anagrammes(g1,g2,5)) {printf("c'est bon\n"); exit(0);}
-  }
-};
+////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
 class DetecteurDeGamme {
 public:
   int gammes_possibles[12];
@@ -841,118 +819,122 @@ public:
   }
   // est ce que la note fait passer la gamme dans une autre gamme,
   // sinon la note est dite mauve et la méthode retourne -1
-  // cette methode n'est appelable que si
   
   int is_cette_note_fait_passer_la_gamme_dans_une_autre_gamme(int gamme, int note) {
     int gamme_a_tester[7];
     //autrement dit
     for (int i=0;i<7;i++) {
-      // on va remplacer la ième note de la gamme en cours par la note et 
-      // regarder si on obtient une gamme
-      if (gammes[gamme][i]!=note) {
-	// on commence par créer la "gamme" à tester
-	for (int j=0;j<7;j++) {
-	  gamme_a_tester[j]=gammes[gamme][j];										
+		// on va remplacer la ième note de la gamme en cours par la note et 
+		// regarder si on obtient une gamme
+		if (gammes[gamme][i]!=note) {
+			// on commence par créer la "gamme" à tester
+			for (int j=0;j<7;j++) {
+			  gamme_a_tester[j]=gammes[gamme][j];										
+			}
+			gamme_a_tester[i]=note;
+			// et maintenant on regarde si la gamme 
+			// à tester est un anagramme d'une gamme
+			for (int k=0;k<12;k++) {
+			  if (are_anagrammes(gamme_a_tester,gammes[k],7)) return k;
+			  // si la radio ne me touchait pas, je ne l'écouterais pas, donc je l'écoute parce qu'elle me touche
+			}
+		}
 	}
-	gamme_a_tester[i]=note;
-	// et maintenant on regarde si la gamme 
-	// à tester est un anagramme d'une gamme
-	for (int k=0;k<12;k++) {
-	  if (are_anagrammes(gamme_a_tester,gammes[k],7)) return k;
-	  // il faut toujours être responsable de quelqu'un ou de quelquechose
-	  // si Alice se suicide, elle veut qu'on dise qu'elle s'est suicidée parce que c'était cool.
-	  // bref, c'est une chipie et une sale gosse
-	  // si la radio ne me touchait pas, je ne l'écouterais pas, donc je ne l'écoute que parce qu'elle me touche
-					}
-				}
-    }
-			return -1;
+	return -1;
   }
   void process() {
+///////////////////////////////////////////////////////////////////////////////////////
+/////////// MON PLUS BEAU CODE DE TOUS LES TEMPS
+///////////////////////////////////////////////////////////////////////////////////////
+
     int note=note_en_cours();
+
     if (note==-1) return;
-    
     
     for (int i=0;i<12;i++) { // pour chaque gammes
       int note_absente=1;
       for (int j=0;j<7;j++) { // pour chaque note de la gamme
-	if (note==gammes[i][j]) {
-	  note_absente=0;
-	  break;
+		if (note==gammes[i][j]) {
+		  note_absente=0;
+		  break;
+		}
 	}
-      }
-      if (note_absente)
-	gammes_possibles[i]=0;
-      
+	if (note_absente)
+		gammes_possibles[i]=0;
     }
     
     int aucune_gamme_n_est_possible=1;
+
     for (int i=0;i<12;i++) {
       if (gammes_possibles[i]) {
-	aucune_gamme_n_est_possible=0;
-	break;
+		aucune_gamme_n_est_possible=0;
+		break;
       }
     }
+
     if (aucune_gamme_n_est_possible) {
       for (int i=0;i<12;i++) {// on reset la tab des games possibles
-	gammes_possibles[i]=1;
+		gammes_possibles[i]=1;
       }
     }
     
     char s[128];
     float xaff;
     if (!muted) {
-      sprintf(s,"- ");
-      for (int i=0;i<12;i++) {
-	if (gammes_possibles[i]) {
-	  strcat(s,note_name(i));
-	  strcat(s,"/");
-	  strcat(s,note_name(gamme_relative(i)));
-	  strcat(s," ");
-	}
-      }
-      xaff=1.1;
-      aff_txt_at_pos(s,xaff,1.5);
-    }
-    nb_gammes_possibles=0;
-    for (int i=0;i<12;i++) {
-      if (gammes_possibles[i]) nb_gammes_possibles++;
+		sprintf(s,"- ");
+		for (int i=0;i<12;i++) {
+			if (gammes_possibles[i]) {
+				strcat(s,note_name(i));
+				strcat(s,"/");
+				strcat(s,note_name(gamme_relative(i)));
+				strcat(s," ");
 			}
-    
-    if (nb_gammes_possibles==1) {
-      for (int i=0;i<12;i++) {
-	if (gammes_possibles[i]) gamme=i;
-      }
-      if (!muted) {
-	sprintf(s," ");
-	for (int i=0;i<7;i++) {
-	  strcat(s,note_name(gammes[gamme][i]));
-	  strcat(s," ");
-	}
-	aff_txt_at_pos(s,xaff,1.3);
-      }
-    } if (nb_gammes_possibles==0) {
-      gamme=-1;
-    } else {
-      if (!muted) {
-	if (nb_gammes_possibles<=3) {
-	  char *s=(char*)malloc(sizeof(char)*125);
-	  sprintf(s," ");
-	  for (int i=0;i<12;i++) {
-	    if (gammes_possibles[i]) {
-	      s=notes_gamme_cat(i,s);
-	      strcat(s," ");
-	    }
-	  }
-	  
-	  aff_txt_at_pos(s,xaff,1.3);
-	  free(s);
-	}
-      }
+		}
+		xaff=1.1;
+		aff_txt_at_pos(s,xaff,1.5);
     }
+
+	nb_gammes_possibles=0;
+
+	for (int i=0;i<12;i++) {
+		if (gammes_possibles[i]) nb_gammes_possibles++;
+	}
     
-  }
-  
+	if (nb_gammes_possibles==1) {
+
+		for (int i=0;i<12;i++) {
+			if (gammes_possibles[i]) gamme=i;
+		}
+
+		if (!muted) {
+			sprintf(s," ");
+			for (int i=0;i<7;i++) {
+				strcat(s,note_name(gammes[gamme][i]));
+				strcat(s," ");
+			}
+			aff_txt_at_pos(s,xaff,1.3);
+		}
+	} if (nb_gammes_possibles==0) {
+		gamme=-1;
+	} else {
+			if (!muted) {
+				if (nb_gammes_possibles<=3) {
+					char *s=(char*)malloc(sizeof(char)*125);
+					sprintf(s," ");
+					for (int i=0;i<12;i++) {
+						if (gammes_possibles[i]) {
+							s=notes_gamme_cat(i,s);
+							strcat(s," ");
+					    }
+					}
+	  
+					aff_txt_at_pos(s,xaff,1.3);
+					free(s);
+
+				}
+			}
+		}	
+	}
 };
 class DetecteurDeGammePentatonique {
 public:
@@ -1047,10 +1029,12 @@ public:
   }
 
 };
+// la même
 
 // Constructor
 DetecteurDeGamme *detecteurDeGamme=new DetecteurDeGamme();
 DetecteurDeGammePentatonique *detecteurDeGammePentatonique=new DetecteurDeGammePentatonique();
+
 void def_mot(char *s) {
   char cmd[64];
   sprintf(cmd,"echo %s >/home/pi/prg/colormusic/random_word",s);
@@ -2083,8 +2067,8 @@ int myDigitalWrite(int note, int val) {
     sprintf(s3001,"/home/pi/prg/colormusic/signal %d | aplay -f cd\n",note2freq[note]);
     //fprintf(stderr,s3001);
 
-    //system(s3001);	
-    detect_gamme(note);
+    //system(s3001);
+	//bookk
   }
   
   
@@ -6188,20 +6172,20 @@ public:
     */
   }
   int particule_evolue() {
-    if (!Particule::particule_evolue()) return 0; /* on appelle bien tranquillement la méthode de la classe mère */
+  	if (!Particule::particule_evolue()) return 0; /* on appelle bien tranquillement la méthode de la classe mère */
     /* et ensuite on fait ce qu'il faut faire comme par exemple gérer les hits de pastilles */
-    for (int i=0;i<NB_PASTILLES;i++) {
-      if (sqrt(sqr(tab_pastilles[i].x-this->pos->x)+sqr(tab_pastilles[i].y-this->pos->y))<RAYON_DE_PERCUSSION_TIR_PASTILLE) {
-	if (!tab_pastilles[i].touched) {
-	  tab_pastilles[i].touched=1;
+		for (int i=0;i<NB_PASTILLES;i++) {
+			if (sqrt(sqr(tab_pastilles[i].x-this->pos->x)+sqr(tab_pastilles[i].y-this->pos->y))<RAYON_DE_PERCUSSION_TIR_PASTILLE) {
+			if (!tab_pastilles[i].touched) {
+				tab_pastilles[i].touched=1;
 	  /*	donc là, ce qui serait bien c'est de tester si la méthode fonctionne toujours mais j'ai méga la flemme 
 		je veux être dans un appartement new yorkais, ou dans un loft berlinois, non en fait je ne veux pas être alleurs qu'ici,
 		le plaisir de tester c'est le plaisir de débugger
 	  */
-	  cree_un_nuage_de_particules_autour_du_point(tab_pastilles[i].x, tab_pastilles[i].y, random() % 12 );
+				cree_un_nuage_de_particules_autour_du_point(tab_pastilles[i].x, tab_pastilles[i].y, random() % 12 );
+			}
+		}
 	}
-      }
-    }
   }
   void particule_affiche() {
     /* la petite méthode d'affichage qui va bien et qui remplace la méthode virtuelle de la classe mère */
