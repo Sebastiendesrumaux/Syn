@@ -38,7 +38,6 @@ long int moteur=0;
 #define MIKADO -7
 #define ORBITATION -10
 #define TETRAMAUVEM16 -16
-#define ARBRE -17
 
 long int moteur1=0;
 long int moteur2=0;
@@ -55,7 +54,7 @@ int new_txt_video_clip=0;
 int dbg=0;
 int affiche_pastilles=1;	
 int affiche_poles=0;	
-int auto_change=1;
+int auto_change=0;
 int leds=0; //parce que quand on lance gdb, on ne lance pas la partie python et donc le programme ne décolle pas
 //on pourrait tester en lançant la partie python avec un exec mais on a la flemme
 //donc si tu veux remettre les leds quand le programme est debugué, n'hésite pas à repasser ça a 1
@@ -63,7 +62,7 @@ int wordsdisplay=0;
 #define firstpart -17
 #define lastpart 13
 //int partnum=firstpart;
-int partnum=13; //-16;
+int partnum=-17; //-16;
 int prevpart=-300000;
 //0 : la courbe en 3D
 unsigned long int vbl=0;
@@ -121,7 +120,6 @@ unsigned char *canvas;
 
 int dimX=0;//1360
 int dimY=0;//768
-//#include <wiringPi.h>
 int gargc;
 int haptique=0;
 
@@ -2245,6 +2243,7 @@ int myDigitalWrite(int note, int val) {
   if ((XXX)) {
     SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
     SDL_RenderClear( gRenderer );
+
     int alphas[12];
     int intensitemax=0;
     //recherche de l'intensité max
@@ -2923,7 +2922,7 @@ int initsdl() { //et opengl
 
 }
 
-
+//passage par adresse
 vector<int> decomposerEnNombresPremiers(int n, const vector<int>& premiers) {
   vector<int> facteurs;
 	    
@@ -3032,6 +3031,11 @@ int cherche_et_retourne_la_plus_petite_periode_dans_sequence_si_presente(int *se
     return -1;
   }
 }
+
+
+// on a passé cette zone un peu douloureuse à appréhender, on peut maintenant
+// y retourner si on le souhaite ou continuer jusque l'arbre
+
 int test_periodiqueur() {
   char s[1024];
   cout << "Entrer la chaine : ";
@@ -3191,6 +3195,7 @@ int main(int argc, char **argv) {
 }
 
 // probablement l'espèce de jeu de cartes
+
 void cubar() {
   glEnable(GL_DEPTH_TEST);
   int c=0;
@@ -3215,6 +3220,9 @@ void cubar() {
     c=c+1;
   }
 }
+
+// le jeu de carte éclairé
+
 void cubar2() {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
@@ -3290,7 +3298,7 @@ float rotxya = 0;
 float rotxza = 0;
 float rotyza = 0;
 
-
+// un effet
 
 void pcube(float x, float y, float z, float size) {
   float s2=size / 2;
@@ -3817,6 +3825,9 @@ void nlcube(float x, float y, float z, float size, float deport, float amorti_vi
   //M-% query-replace
   
 }
+
+// je crois bien que c'est l'hyper hyper cube mais je n'en suis pas
+// tout à fait sûr
 void cubesdanscubes(float x, float y, float z, float size) {
 	
   float k=0.1;
@@ -3849,6 +3860,8 @@ void cubesdanscubes(float x, float y, float z, float size) {
   glPopMatrix();
 }
 
+// cube avec les faces déportées qu'on aperçoit au dessus
+// du tapis de points
 
 void tcube(float x, float y, float z, float size) {
   float s2=size / 2;
@@ -4197,6 +4210,7 @@ ProgStarfield *progstarfield = new ProgStarfield();
   }
   int
 */ 
+// les lignes parallèles
 void sdamier() {
   float sizex=12;
   float sizey=12;
@@ -4319,6 +4333,7 @@ float mappage(DamierData *dd,float **map, int i, int j, int di, int dj) {
 }
 //Constructeur
 DamierData *dp = new DamierData(40,40);
+// le damier de point... 
 void damier_de_points() {
   //float sizex=12;
   //float sizey=12;
@@ -4461,6 +4476,7 @@ void normalize(float *v) {
 }
 //Constructeur
 DamierData *sp=new DamierData(10,10);
+
 void damier() {
 
 
@@ -10014,70 +10030,106 @@ public:
 class MandelMap {
 public:
 
-  static const int iw = 128;//2*64;
-  static const int ih = 128;//2*64;
-  Mandelbrot *mandel[12];
-  unsigned int textures[12];
-  int onote=-1;
-  int nb_repetitions_de_la_note_en_cours=0;
-  int nb_repetitions_de_la_note_en_cours_avant_zoom=7;
-  void display() {
-    glEnable(GL_TEXTURE_2D);
-    if ((!aucune_note) && (note_en_cours()==onote)) {
-      nb_repetitions_de_la_note_en_cours++;
+	static const int iw = 128;//2*64;
+	static const int ih = 128;//2*64;
+	unsigned int textures[12];
+	int onote=-1;
+	int nb_repetitions_de_la_note_en_cours=0;
+	int nb_repetitions_de_la_note_en_cours_avant_zoom=7;
+	void display() {
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
 
-      if (nb_repetitions_de_la_note_en_cours>nb_repetitions_de_la_note_en_cours_avant_zoom) {
-	mandel[note_en_cours()]->zoom(100);
+		int alphas[12];
+		int intensitemax=0;
+		//recherche de l'intensité max
+		for (int i=0;i<12;i++) {
+			if (notes_val_dans_l_octave[i]>intensitemax)
+				intensitemax=notes_val_dans_l_octave[i];
+		}
+		int nb_couches=0;
+		for (int i=0;i<12;i++) {
+			if (note_on_off[i])
+				nb_couches=nb_couches+1;
+		}
 
-	glBindTexture(GL_TEXTURE_2D,textures[note_en_cours()]);
-	glTexImage2D(GL_TEXTURE_2D, 
-		     0/*mipmap level*/, 
-		     GL_RGB,// internal format 
-		     iw, 
-		     ih, 
-		     0/*width of border*/, 
-		     GL_RGB, 
-		     GL_UNSIGNED_BYTE, 
-		     mandel[note_en_cours()]->pix);
-					
+		if (nb_couches>0) {
+			// on va commencer par trier ces couches
+			int i=0;
+			int ptr[12]={0,1,2,3,4,5,6,7,8,9,10,11};
+			int echange;
+			do {
+				i=0;
+				echange=0;
+				do {
+					if (notes_val_dans_l_octave[ptr[i]] < notes_val_dans_l_octave[ptr[i+1]]) {
+						int aux=ptr[i];
+						ptr[i]=ptr[i+1];
+						ptr[i+1]=aux;
+						echange=1;
+					}
+					i=i+1;
+				} while ((i!=11) && (echange==0));
+			} while (echange==1);
+			//on normalise pour que la couche avec le val max soit avec un alpha de 255 et que les autres aient des alphas proportionnels
+			//on met tous les alphas des couches
+	
+			for (int i=0;i<12;i++) {
+				alphas[i]=(int)(255*((float)(notes_val_dans_l_octave[i]))/((float)(intensitemax)) / nb_couches );
+			}
+			/*
+			for (int i=0;i<12;i++) {
+				alphas[ptr[i]]= alphas[ptr[i]] / pow(2,i);
+			}*/
+			for (int i=0;i<12;i++) {
+				if ((note_on_off[ptr[i]])) {
+					if (note_on_off[ptr[i]]) {
+					    glBindTexture(GL_TEXTURE_2D,textures[ptr[i]]);
+					    glBegin(GL_QUADS);
+						glColor4ub(255,255,255,alphas[ptr[i]]); // sinon le starfield en changeant le glcolor modifie la luminosité de la texture
+						glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, 1);
+						glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, 1);
+						glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, 1.0, 1);
+						glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, 1.0,1);
+						glEnd();
+					}
+				}
+			}	
+		}
+	    glDisable(GL_TEXTURE_2D);
+		glDisable(GL_BLEND);
+	
+	}
 
-	nb_repetitions_de_la_note_en_cours=0;
-      }
-    }
-    onote=note_en_cours();
-    glBindTexture(GL_TEXTURE_2D,textures[note_en_cours()]);
-    glBegin(GL_QUADS);
-    glColor3ub(255,255,255); // sinon le starfield en changeant le glcolor modifie la luminosité de la texture
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, 1);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, 1);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, 1.0, 1);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, 1.0,1);
 
-    glEnd();
 
-    glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
-  }
+
   MandelMap() {
     glGenTextures(12,textures);
     for (int i=0;i<12;i++) {
+		SDL_Surface *surface;
+		char s[128];
+		int numdirpar=1;
+	    sprintf(s,"/home/pi/prg/colormusic/img/i%d/%d.jpg",numdirpar,i+1);
+
+		surface = IMG_Load(s);
+
+
       glBindTexture(GL_TEXTURE_2D,textures[i]);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR/*GL_NEAREST*/); /*pas d'interpolation, le pixel le plus prés est pris*/
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR/*GL_NEAREST*/); /*pas d'interpolation, le pixel le plus prés est pris*/
-      printf("lala\n");
-      mandel[i] = new Mandelbrot(iw,ih,40);
       glTexImage2D(GL_TEXTURE_2D, 
 		   0/*mipmap level*/, 
 		   GL_RGB,// internal format 
-		   iw, 
-		   ih, 
+		   surface->w, 
+		   surface->h, 
 		   0/*width of border*/, 
 		   GL_RGB, 
 		   GL_UNSIGNED_BYTE, 
-		   mandel[i]->pix);
-      printf("lala2");
-	
+		   surface->pixels);
+		SDL_FreeSurface(surface);
     }
+
   }
 };
 MandelMap *mandelmap;
@@ -11392,7 +11444,7 @@ namespace tetree {
   };
 }
 using namespace tetree;
-Arbre *arbre=new Arbre();
+//Arbre *arbre=new Arbre();
 
 
 
@@ -11711,9 +11763,9 @@ void *gl_animate(void *ptr) {
 
       angle = angle + 1; if (angle == 360) angle = 0;
       calcul_matrice_deplacement_en_fonction_des_notes_et_de_la_partnum();
-      if (partnum==ARBRE) {
-	arbre->affiche();
-      }
+      //if (partnum==-17) {
+	//arbre->affiche();
+      //}
       if (partnum==TETRAMAUVEM16) {
 	if (circlesTunnel==NULL) {
 	  circlesTunnel=new CirclesTunnel();
@@ -11735,12 +11787,256 @@ void *gl_animate(void *ptr) {
 	glDisable(GL_BLEND);
       }
       if (partnum==-13) {
-	//if (mandelmap==NULL) 
-	//	mandelmap=new MandelMap();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  unsigned int textures[12];
+  Mandelbrot *mandel[12];
+  int iw=640;
+  int ih=480;
+if (premierevbl) {
+
+  glGenTextures(12,textures);
+    for (int i=0;i<12;i++) {
+      glBindTexture(GL_TEXTURE_2D,textures[i]);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR/*GL_NEAREST*/); /*pas d'interpolation, le pixel le plus prés est pris*/
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR/*GL_NEAREST*/); /*pas d'interpolation, le pixel le plus prés est pris*/
+      printf("lala\n");
+      mandel[i] = new Mandelbrot(iw,ih,40);
+      glTexImage2D(GL_TEXTURE_2D, 
+		   0/*mipmap level*/, 
+		   GL_RGB,// internal format 
+		   iw, 
+		   ih, 
+		   0/*width of border*/, 
+		   GL_RGB, 
+		   GL_UNSIGNED_BYTE, 
+		   mandel[i]->pix);
+      printf("lala2");
+	
+    }
+  }
+
+
+{
+	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear( gRenderer );
+
+	int alphas[12];
+	int intensitemax=0;
+	//recherche de l'intensité max
+	for (int i=0;i<12;i++) {
+		if (notes_val_dans_l_octave[i]>intensitemax)
+			intensitemax=notes_val_dans_l_octave[i];
+	}
+	int nb_couches=0;
+	for (int i=0;i<12;i++) {
+		if (note_on_off[i])
+			nb_couches=nb_couches+1;
+	}
+
+	if (nb_couches>0) {
+		// on va commencer par trier ces couches
+		int i=0;
+		int ptr[12]={0,1,2,3,4,5,6,7,8,9,10,11};
+		int echange;
+		do {
+			i=0;
+			echange=0;
+			do {
+				if (notes_val_dans_l_octave[ptr[i]] < 
+					notes_val_dans_l_octave[ptr[i+1]]) {
+						int aux=ptr[i];
+						ptr[i]=ptr[i+1];
+						ptr[i+1]=aux;
+						echange=1;
+					}
+				i=i+1;
+			} while ((i!=11) && (echange==0));
+		} while (echange==1);
+			//on normalise pour que la couche avec le val max soit avec un alpha de 255 et que les autres aient des alphas proportionnels
+		for (int i=0;i<12;i++) {
+			alphas[i]=(int)(255*((float)(notes_val_dans_l_octave[i]))/((float)(intensitemax)) /*/nb_couches*/ );
+		}/*
+					fprintf(stderr,"alphas : ");
+					for (int i=0;i<12;i++) {
+					fprintf(stderr,"%d ",alphas[i]);
+					}
+					fprintf(stderr,"\n");
+				*/
+				// c'est une merveilleuse petite machine, tout est sauvé, 
+				//c 'est un terrain de jeu formidable 
+		for (int i=0;i<12;i++) {
+			alphas[ptr[i]]=alphas[ptr[i]] / pow(2,i+1-1);
+		}
+				//int a=255/nb_couches;
+		for (int i=0;i<12;i++) {
+			if ((note_on_off[ptr[i]])) {
+				SDL_SetTextureAlphaMod( newTexture[ptr[i]+1], alphas[ptr[i]] );
+				renderTexture(newTexture[ptr[i]+1], 0, 0, NULL );
+			}
+		}
+	}
+    //Update screen
+	SDL_RenderPresent( gRenderer );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+if (partnum==-17) {
+
+	if (mandelmap==NULL) 
+		mandelmap=new MandelMap();
 	starfield();
 	//progstarfield->process();
-	//mandelmap->display();
+	mandelmap->display();
       }
+
       if (partnum==-12) {
 	dodeca->draw();
       }
@@ -11889,7 +12185,7 @@ void *gl_animate(void *ptr) {
 	  damier();
 	}	
 
-      }
+  }
       SDL_GL_SwapWindow(glwin);
       if (premierevbl) {premierevbl=0;} else {
 	vbl++;
